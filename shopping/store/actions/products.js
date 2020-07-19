@@ -60,9 +60,11 @@ export const deleteProduct = productId => {
 
 // dispatch will passed by ReduxThunk
 export const createProduct = (title, description, imageUrl, price) => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    // Fetch the token from the redux state
+    const token = getState().auth.token;
     //any async code
-    const response = await fetch('https://rn-shopping-b46a3.firebaseio.com/products.json', {
+    const response = await fetch(`https://rn-shopping-b46a3.firebaseio.com/products.json?auth={token}`, {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'

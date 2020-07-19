@@ -14,10 +14,14 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 // While sending HTTP request
 import ReduxThunk from 'redux-thunk';
 
+// Reducer for login
+import authReducer from './store/reducers/auth';
+
 const rootReducer = combineReducers({
   products: productsReducer,
   cart: cartReducer,
-  orders: ordersReducer
+  orders: ordersReducer,
+  auth: authReducer
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
