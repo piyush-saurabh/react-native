@@ -1,5 +1,19 @@
-export const SIGNUP = 'SIGNUP';
-export const LOGIN = 'LOGIN';
+// Implement auto-login
+import { AsyncStorage } from 'react-native';
+
+// export const SIGNUP = 'SIGNUP';
+// export const LOGIN = 'LOGIN';
+export const AUTHENTICATE = 'AUTHENTICATE';
+
+// Log the user in if async storage exists
+export const authenticate = (userId, token) => {
+    return {
+        type: AUTHENTICATE,
+        userId: userId,
+        token: token
+    };
+
+};
 
 // Refer https://firebase.google.com/docs/reference/rest/auth#section-create-email-password
 export const signup = (email, password) => {
@@ -32,11 +46,18 @@ export const signup = (email, password) => {
 
         const responseData = await response.json();
         console.log(responseData);
-        dispatch({
-            type: SIGNUP,
-            userId: responseData.idToken,
-            token: responseData.localId
-        });
+        dispatch(authenticate(responseData.idToken, responseData.localId));
+        // dispatch({
+        //     type: SIGNUP,
+        //     userId: responseData.idToken,
+        //     token: responseData.localId
+        // });
+
+        // Store the expiration date to check for token expiry
+        const expirationDate = new Date(new Date().getTime() + parseInt(responseData.expiresIn) * 1000); // get the current time in ms
+
+        // After login, save the login data to storage
+        saveDataToStorage(responseData.idToken, responseData.localId, expirationDate);
     }
 };
 
@@ -73,10 +94,26 @@ export const login = (email, password) => {
         const responseData = await response.json();
 
         //console.log(responseData);
-        dispatch({
-            type: LOGIN,
-            userId: responseData.idToken,
-            token: responseData.localId
-        });
+        dispatch(authenticate(responseData.idToken, responseData.localId));
+        // dispatch({
+        //     type: LOGIN,
+        //     userId: responseData.idToken,
+        //     token: responseData.localId
+        // });
+
+        // Store the expiration date to check for token expiry
+        const expirationDate = new Date(new Date().getTime() + parseInt(responseData.expiresIn) * 1000); // get the current time in ms
+
+        // After login, save the login data to storage
+        saveDataToStorage(responseData.idToken, responseData.localId, expirationDate);
     }
+};
+
+// Save login data on the mobile disk
+const saveDataToStorage = (token, userId, expirationDate) => {
+    AsyncStorage.setItem('userData', JSON.stringify({
+        token: token,
+        userId: userId,
+        expiryDate: expirationDate.toISOString()
+    }));
 };

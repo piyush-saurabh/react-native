@@ -20,6 +20,9 @@ import EditProductScreen from '../screens/user/EditProductScreen';
 // Authentication
 import AuthScreen from '../screens/user/AuthScreen';
 
+// Start up screen which checks for login
+import StartupScreen from '../screens/StartupScreen';
+
 import Colors from '../constants/Colors';
 
 const defaultNavOptions = {
@@ -112,6 +115,7 @@ const AuthNavigator = createStackNavigator({
 });
 
 const MainNavigator = createSwitchNavigator({
+  Startup: StartupScreen,
   Auth: AuthNavigator,
   Shop: ShopNavigator
 });
