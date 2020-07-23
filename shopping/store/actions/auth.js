@@ -5,6 +5,8 @@ import { AsyncStorage } from 'react-native';
 // export const LOGIN = 'LOGIN';
 export const AUTHENTICATE = 'AUTHENTICATE';
 
+export const LOGOUT = 'LOGOUT';
+
 // Log the user in if async storage exists
 export const authenticate = (userId, token) => {
     return {
@@ -45,8 +47,8 @@ export const signup = (email, password) => {
         }
 
         const responseData = await response.json();
-        console.log(responseData);
-        dispatch(authenticate(responseData.idToken, responseData.localId));
+        //console.log(responseData);
+        dispatch(authenticate(responseData.localId, responseData.idToken));
         // dispatch({
         //     type: SIGNUP,
         //     userId: responseData.idToken,
@@ -64,7 +66,7 @@ export const signup = (email, password) => {
 // https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
 export const login = (email, password) => {
     return async dispatch => {
-        const response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=firebasekey',
+        const response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=firebaseAPIkey',
         {
             method: 'POST',
             headers: {
@@ -87,6 +89,7 @@ export const login = (email, password) => {
             } else if (errorId === 'INVALID_PASSWORD'){
                 message = 'The password you entered in incorrect';
             }
+            //console.log(errorResponeData);
             throw new Error(message);
             //throw new Error('Something went wrong!!');
         }
@@ -94,7 +97,7 @@ export const login = (email, password) => {
         const responseData = await response.json();
 
         //console.log(responseData);
-        dispatch(authenticate(responseData.idToken, responseData.localId));
+        dispatch(authenticate(responseData.localId, responseData.idToken));
         // dispatch({
         //     type: LOGIN,
         //     userId: responseData.idToken,
@@ -109,6 +112,16 @@ export const login = (email, password) => {
     }
 };
 
+// Logout on button click
+export const logout = () => {
+    return {
+        type: LOGOUT
+    }
+};
+
+// Auto Logout when token expires
+// TODO
+
 // Save login data on the mobile disk
 const saveDataToStorage = (token, userId, expirationDate) => {
     AsyncStorage.setItem('userData', JSON.stringify({
@@ -117,3 +130,4 @@ const saveDataToStorage = (token, userId, expirationDate) => {
         expiryDate: expirationDate.toISOString()
     }));
 };
+
